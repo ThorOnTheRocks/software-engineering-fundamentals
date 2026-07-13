@@ -1,6 +1,6 @@
 # Chapter NN — Title
 
-> **Status:** Draft  
+> **Status:** Drafting
 > **Part:** Part Name  
 > **Prerequisites:** Relevant earlier chapters  
 > **Estimated study time:** To be determined

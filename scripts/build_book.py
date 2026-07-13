@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
-"""Build book.md from approved, numerically named chapter files."""
+"""Build book.md from chapters explicitly marked Integrated in the manifest."""
 
 from __future__ import annotations
 
+import json
 import re
 import sys
 from pathlib import Path
@@ -13,21 +14,40 @@ CHAPTERS_DIR = ROOT / "chapters"
 OUTPUT_PATH = ROOT / "book.md"
 CHAPTER_NAME = re.compile(r"^(?P<number>\d{2})-(?P<slug>[a-z0-9]+(?:-[a-z0-9]+)*)\.md$")
 APPROVED_MARKER = "> **Status:** Approved"
-GENERATED_NOTICE = "<!-- GENERATED FILE: run python3 scripts/build_book.py; do not edit directly. -->"
+GENERATED_NOTICE = "<!-- GENERATED FILE: run python scripts/build_book.py; do not edit directly. -->"
 BOOK_TITLE = "# Software Engineering Fundamentals\n\n*A Durable Guide to Understanding, Building, and Operating Software Systems*"
+MANIFEST_PATH = ROOT / "book-manifest.json"
 
 
 class BuildError(Exception):
     """A clear, expected build failure."""
 
 
-def discover_chapters() -> list[tuple[int, Path, str]]:
-    """Return approved chapters after validating all numeric chapter filenames."""
+def load_integrated_manifest_chapters() -> dict[str, dict[str, object]]:
+    try:
+        manifest = json.loads(MANIFEST_PATH.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as error:
+        raise BuildError(f"cannot load {MANIFEST_PATH.name}: {error}") from error
+    chapters = manifest.get("chapters")
+    if not isinstance(chapters, list):
+        raise BuildError("manifest chapters must be an array")
+    integrated: dict[str, dict[str, object]] = {}
+    for chapter in chapters:
+        if not isinstance(chapter, dict) or not isinstance(chapter.get("id"), str):
+            raise BuildError("every manifest chapter must be an object with a stable id")
+        if chapter.get("current_lifecycle_state") == "Integrated":
+            integrated[str(chapter["expected_chapter_path"])] = chapter
+    return integrated
+
+
+def discover_chapters() -> list[tuple[int, str, Path, str]]:
+    """Return integrated chapters after validating manifest and source metadata."""
     if not CHAPTERS_DIR.is_dir():
         raise BuildError(f"chapter directory does not exist: {CHAPTERS_DIR}")
 
     seen_numbers: dict[int, Path] = {}
-    approved: list[tuple[int, Path, str]] = []
+    integrated_manifest = load_integrated_manifest_chapters()
+    integrated: list[tuple[int, str, Path, str]] = []
 
     for path in sorted(CHAPTERS_DIR.glob("*.md"), key=lambda item: item.name):
         match = CHAPTER_NAME.fullmatch(path.name)
@@ -48,18 +68,31 @@ def discover_chapters() -> list[tuple[int, Path, str]]:
         seen_numbers[number] = path
 
         content = path.read_text(encoding="utf-8").strip()
-        if APPROVED_MARKER in content.splitlines():
-            approved.append((number, path, content))
+        relative_path = str(path.relative_to(ROOT))
+        if relative_path in integrated_manifest:
+            chapter = integrated_manifest.pop(relative_path)
+            if APPROVED_MARKER not in content.splitlines():
+                raise BuildError(f"integrated chapter lacks Approved metadata: {path.name}")
+            if chapter.get("number") != number:
+                raise BuildError(f"manifest number does not match filename for {path.name}")
+            integrated.append((number, str(chapter["id"]), path, content))
 
-    return sorted(approved, key=lambda chapter: chapter[0])
+    if integrated_manifest:
+        missing = ", ".join(sorted(integrated_manifest))
+        raise BuildError(f"integrated manifest chapters are missing source files: {missing}")
+
+    return sorted(integrated, key=lambda chapter: chapter[0])
 
 
-def render_book(chapters: list[tuple[int, Path, str]]) -> str:
+def render_book(chapters: list[tuple[int, str, Path, str]]) -> str:
     sections = [GENERATED_NOTICE, BOOK_TITLE]
     if chapters:
-        sections.extend(content for _, _, content in chapters)
+        for _, chapter_id, _, content in chapters:
+            sections.append(
+                f"<!-- BEGIN CHAPTER: {chapter_id} -->\n\n{content}\n\n<!-- END CHAPTER: {chapter_id} -->"
+            )
     else:
-        sections.append("_No chapters have been approved yet._")
+        sections.append("_No chapters have been integrated yet._")
     return "\n\n".join(sections) + "\n"
 
 
@@ -72,7 +105,7 @@ def main() -> int:
         return 1
 
     noun = "chapter" if len(chapters) == 1 else "chapters"
-    print(f"built {OUTPUT_PATH.name} from {len(chapters)} approved {noun}")
+    print(f"built {OUTPUT_PATH.name} from {len(chapters)} integrated {noun}")
     return 0
 
 

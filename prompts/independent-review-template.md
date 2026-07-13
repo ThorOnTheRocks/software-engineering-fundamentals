@@ -1,5 +1,7 @@
 # Codex Task — Independent Chapter Quality Review
 
+> **Manual fallback:** The canonical `$ebook` workflow uses the project-scoped read-only reviewer agents. A reviewer returns findings only; the main agent records them in the review file.
+
 ## Goal
 
 Perform a critical editorial and technical review of:
@@ -43,8 +45,7 @@ Review the chapter independently for:
 
 ## Work to Perform
 
-1. Add an `Independent Review` section to:
-   - `reviews/<NN>-<slug>-review.md`
+1. Return material for an `Independent Review` section; do not edit repository files.
 2. Identify findings by severity:
    - `Blocking`
    - `Major`
@@ -57,7 +58,7 @@ Review the chapter independently for:
 4. Re-score all quality-rubric criteria independently.
 5. Do not rewrite the chapter in this task unless explicitly instructed.
 6. Recommend either:
-   - `Approve`;
+   - `Candidate`;
    - `Revise`;
    - `Restructure`.
 

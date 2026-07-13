@@ -1,5 +1,7 @@
 # Codex Task — Draft and Review One Ebook Chapter
 
+> **Manual fallback:** The canonical workflow is `$ebook`. This targeted prompt must still obey `book-manifest.json`, `docs/CHAPTER_LIFECYCLE.md`, deterministic validation, and the human-only approval transition.
+
 Replace every value in angle brackets before running.
 
 ## Goal
@@ -8,7 +10,7 @@ Draft, review, and revise:
 
 **Chapter <NN> — <CHAPTER TITLE>**
 
-The final chapter should meet the repository’s approval threshold or clearly remain marked `Revision Required` with unresolved issues documented.
+The final chapter should reach `Candidate for Human Approval` or clearly remain `Revision Required` with unresolved issues documented. This prompt cannot approve a chapter.
 
 ## Context
 
@@ -90,7 +92,8 @@ Do not begin writing until you understand the chapter’s purpose, prerequisites
    - scope boundaries.
 15. Score every quality-rubric criterion with evidence.
 16. Revise again if any criterion is below 3/5 or the average is below 4/5.
-17. Update `docs/BOOK_STATUS.md`.
+17. Update `book-manifest.json`, then regenerate `docs/BOOK_STATUS.md` with `python scripts/sync_book_status.py`.
+18. Run `python scripts/validate_book.py` before presenting a candidate.
 
 ## Constraints
 
@@ -100,7 +103,7 @@ Do not begin writing until you understand the chapter’s purpose, prerequisites
 - Do not fabricate sources, quotations, benchmarks, or production claims.
 - Do not turn language examples into framework tutorials.
 - Do not edit unrelated chapters unless necessary to fix a contradiction, broken link, or terminology inconsistency.
-- Do not mark the chapter `Approved` unless it satisfies the documented threshold.
+- Do not mark the chapter `Approved`; only a human may make the candidate-to-approved transition.
 - When evidence is uncertain or context-dependent, say so explicitly.
 - Keep advanced material connected to practical engineering decisions.
 

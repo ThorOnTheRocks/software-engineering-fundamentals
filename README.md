@@ -2,7 +2,7 @@
 
 **Software Engineering Fundamentals: A Durable Guide to Understanding, Building, and Operating Software Systems** is a long-form Markdown ebook for mid-level engineers developing senior-level judgment across software design, systems, reliability, architecture, delivery, and AI-assisted development.
 
-The book is authored and approved one chapter at a time. Its editorial source of truth is [the book blueprint](docs/BOOK_BLUEPRINT.md), and current progress is tracked in [the book status](docs/BOOK_STATUS.md).
+The book is authored, reviewed, approved, and integrated one chapter at a time. [The book blueprint](docs/BOOK_BLUEPRINT.md) owns the intellectual architecture, [the machine-readable manifest](book-manifest.json) owns workflow state, and [the book status](docs/BOOK_STATUS.md) is the generated human-readable projection.
 
 ## Authoring workflow
 
@@ -16,7 +16,13 @@ Before working on a chapter, read:
 6. [the editorial workflow](docs/EDITORIAL_WORKFLOW.md)
 7. [the book status](docs/BOOK_STATUS.md)
 
-Use [the chapter-authoring prompt](prompts/chapter-authoring-template.md) for one chapter at a time. Use [the independent-review prompt](prompts/independent-review-template.md) in a separate Codex thread when a draft needs an adversarial review.
+The canonical workflow is repository-native and does not require a chapter number:
+
+```text
+$ebook Continue the book autonomously until the next human decision is required.
+```
+
+It validates repository evidence, selects the highest-priority legal action, resumes existing work, runs read-only specialist reviewers, and stops at human gates. The prompts under `prompts/` remain manual references for targeted work but do not replace the lifecycle or human approval gate.
 
 Chapter files belong in `chapters/`; their plans, evidence, scores, and decisions belong in `reviews/`. Exercises remain in chapters unless a separate workbook is intentionally created.
 
@@ -25,10 +31,19 @@ Chapter files belong in `chapters/`; their plans, evidence, scores, and decision
 The build uses only the Python standard library:
 
 ```sh
-python3 scripts/build_book.py
+python scripts/build_book.py
 ```
 
-The script selects chapter files whose metadata contains the exact line `> **Status:** Approved`, orders them numerically, and regenerates `book.md`. It rejects duplicate chapter numbers and never modifies source chapters. Do not edit `book.md` directly.
+The script selects chapters whose manifest state is `Integrated`, verifies their source metadata is `Approved`, orders them numerically, and regenerates `book.md`. It rejects missing or duplicate chapter numbers and never modifies source chapters. Do not edit `book.md` directly.
+
+Inspect and validate workflow state with:
+
+```sh
+python scripts/next_book_action.py
+python scripts/validate_book.py
+```
+
+The canonical command name is `python`; on hosts that expose Python 3 only as `python3`, substitute that executable.
 
 ## Repository map
 
@@ -40,7 +55,9 @@ The script selects chapter files whose metadata contains the exact line `> **Sta
 - `templates/`: reusable content structures
 - `prompts/`: repeatable Codex tasks
 - `scripts/`: small, dependency-free project automation
+- `.agents/skills/ebook/`: canonical autonomous editorial workflow
+- `.codex/agents/`: read-only specialist reviewer definitions
+- `book-manifest.json`: canonical machine-readable workflow index
 - `glossary.md`: canonical definitions used across chapters
 - `references.md`: sources cited by the book
-- `book.md`: generated compilation of approved chapters
-# software-engineering-fundamentals
+- `book.md`: generated compilation of integrated chapters

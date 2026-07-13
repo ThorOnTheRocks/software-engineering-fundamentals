@@ -85,6 +85,14 @@ When introducing jargon:
 
 Do not attempt to write the entire book in one task.
 
+For autonomous continuation, use the repository skill:
+
+```text
+$ebook Continue the book autonomously until the next human decision is required.
+```
+
+The skill discovers the target and phase from `book-manifest.json` plus repository evidence. Follow `docs/CHAPTER_LIFECYCLE.md` and `docs/EDITORIAL_WORKFLOW.md`; only a human may transition a chapter from `Candidate for Human Approval` to `Approved`.
+
 For each chapter:
 
 1. inspect the blueprint, template, quality rubric, and relevant earlier chapters;
@@ -94,7 +102,7 @@ For each chapter:
 5. record weaknesses, unresolved questions, duplicated material, and cross-reference opportunities in the review file;
 6. revise the chapter until it reaches the quality threshold;
 7. update `references.md` and `glossary.md` when needed;
-8. do not mark a chapter approved unless the review file shows an average score of at least 4/5 and no criterion below 3/5.
+8. do not present a chapter for human approval unless the review file shows an average score of at least 4/5 and no criterion below 3/5; only the human decision may mark it approved.
 
 ## Scope Control
 
