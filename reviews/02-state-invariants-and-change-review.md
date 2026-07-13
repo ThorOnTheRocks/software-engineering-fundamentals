@@ -1,11 +1,15 @@
-# Chapter 02 — State, Invariants, and Change: Architecture Review
+# Chapter 02 — State, Invariants, and Change: Architecture and Draft Review
 
-> **Status:** Planning  
-> **Part:** Part I — Thinking Like a Software Engineer  
-> **Planning date:** 2026-07-13  
-> **Blueprint core question:** What must always remain true, regardless of how the system changes?  
-> **Plan quality score:** 4.25/5  
-> **Chapter file:** Not created; drafting is outside this phase
+> **Status:** Approved
+> **Part:** Part I — Thinking Like a Software Engineer
+> **Planning date:** 2026-07-13
+> **Draft and self-review date:** 2026-07-13
+> **Blueprint core question:** What must always remain true, regardless of how the system changes?
+> **Plan quality score:** 4.25/5
+> **Draft quality score (self-review):** 4.42/5
+> **Draft quality score (independent review):** 4.25/5
+> **Post-revision quality score:** 4.33/5
+> **Chapter file:** `chapters/02-state-invariants-and-change.md`
 
 ## Planning Decision
 
@@ -532,13 +536,398 @@ These scores assess whether the architecture is likely to produce a strong chapt
 | Verification | 4/5 | Six exercises cover explanation, diagnosis, design, and extension, each with criteria for a strong answer; mastery requires transfer to an unfamiliar feature. | There are no drafted prompts, sample artifacts, or answer guidance yet. | Provide enough concrete data in each exercise for reproducible reasoning and include concise self-check criteria without giving away the design answer. |
 | Integration | 4/5 | The plan assigns canonical ownership across relevant earlier/later chapters, anticipates glossary terms, avoids broken links, and records duplication risks. | No approved chapters exist, so consistency cannot yet be verified in practice. | Revisit terminology after Chapters 01 and 13 are planned or drafted and perform the scheduled three-to-five-chapter integration review. |
 
-**Total:** 51/60  
+**Total:** 51/60
 **Average:** 4.25/5
 
 The plan clears the numerical threshold used for chapter approval, but that threshold does not apply to a planning artifact. The eventual chapter must be independently scored from its actual prose, examples, exercises, references, and cross-links.
 
-## Final Status and Next Action
+## Pass A Status and Next Action
 
-**Final status:** `Planning`
+**Pass A final status:** `Planning`
 
 **Architecture readiness:** Ready for human review. The recommended next action is a focused editorial decision on the meanings of accepted/observable state, fact-level authority versus “source of truth,” and whether the primary example retains completion history. After those decisions, the next separate task may draft the chapter; this task stops before drafting.
+
+## Passes B–D Drafting and Self-Review Record
+
+The human-approved editorial decisions resolved the four central Pass A questions without requiring an architectural redesign. The chapter was drafted from the approved reasoning path, then revised for technical accuracy, learning progression, and integration. The scores below evaluate the chapter prose rather than the plan. They do not constitute independent approval.
+
+### Drafting decisions
+
+- Defined **accepted state** as state that has crossed the boundary responsible for validating and accepting a change and may be relied upon by the rest of the system.
+- Scoped invariants to every accepted state within a declared boundary. Explicitly allowed temporary private inconsistency only when it cannot escape, be observed, or become the accepted result of a failed operation.
+- Used **authoritative source for a named fact** and **decision authority** as the precise terminology. Introduced “single source of truth” only as potentially misleading industry shorthand.
+- Used the bidirectional current-state rule `status = completed ↔ completed_at is present`. Reopening sets status to `in_progress` and `completed_at` to `null` while minimal transition history preserves earlier completion.
+- Made preservation of the history record part of the logical complete/reopen contract, while deferring the mechanism that establishes the guarantee.
+- Used one Mermaid state-transition diagram for lifecycle intuition and one transition table for exhaustive route and side-effect examination. Both represent the same `todo` → `in_progress` → `completed` workflow with reopening to `in_progress`.
+- Kept the collaborative work item as the only developed example. Used reservations once, as a transfer exercise that exposes concurrency limits.
+- Compressed frontend, backend, relational storage, asynchronous workflow, and AI-assisted system translations into one table.
+- Compressed TypeScript/JavaScript, Python, Ruby, and Go semantics into one comparison table. No language tutorial or framework API was added.
+- Avoided code for database transactions, constraints, locking, messaging, caches, frontend libraries, or agent frameworks. Later chapters are named in prose without broken links because their files do not yet exist.
+
+### Research completed
+
+Research was limited to claims whose exact meaning depends on a language or whose intellectual origin adds value:
+
+| Claim checked | Authoritative source | Draft use |
+|---|---|---|
+| ECMAScript strict equality for object values | Living ECMA-262 specification, `IsStrictlyEqual` and `SameValueNonNumber` | Qualified the JavaScript/TypeScript identity comparison. |
+| Python object identity, mutability, and shared references | Python 3.14 language reference, Data Model | Distinguished `is`, object identity, value, and aliasing without relying on CPython implementation details. |
+| Ruby object identity and class-specific equality | Ruby 3.4.1 `Object` documentation | Distinguished `equal?` from overridable `==`. |
+| Go self-contained values, reference-bearing values, and comparability | Go language specification | Qualified struct/array copying, slices/maps sharing underlying data, and type-specific equality. |
+| Preconditions and postconditions in program reasoning | C. A. R. Hoare, “An Axiomatic Basis for Computer Programming,” 1969 | Acknowledged the formal lineage while keeping the chapter non-formal. |
+
+No database-, framework-, or AI-vendor-specific technical claim was necessary. The draft therefore does not cite PostgreSQL, React, or an agent API. All five sources actually cited in the chapter were added to `references.md`.
+
+### Pass C — Learning-quality findings and revisions
+
+**Conceptual clarity and progression.** The chapter opens with four contradictory representations of one work item. State is defined before the constrained-state-space model is named through invariants, so formal vocabulary is earned by the failure. Every major abstraction returns to `WI-1842`.
+
+**Terminology load.** Candidate state, accepted state, domain identity, runtime identity, value equality, aliasing, invariant, transition, authority, and derivation are introduced in groups tied to one question. The language comparison is subordinate to the identity section. Cache/projection/replica taxonomy is not expanded into a separate conceptual survey.
+
+**Heading density.** The draft uses descriptive H2 sections for the reasoning path and H3 headings mainly where readers need to compare alternatives or failure classes. Short template sections were combined: production, product, and business consequences share one section; connections and further study remain brief. The failure subsections are retained because they support incident-oriented scanning.
+
+**Repetition.** Authority and derivation are defined once, then applied rather than redefined in the five-context table and diagnosis. The conclusion uses compressed claims rather than a prose recap. Repeated warnings about deferred mechanisms were reduced to the boundaries where readers might otherwise infer a guarantee.
+
+**Exercise quality.** Exercises provide snapshots, field domains, traces, or lifecycle states. They cover explanation, diagnosis, design transfer, and rebuildability. Self-checks identify reasoning qualities without prescribing a complete design.
+
+**Transferability.** The reservation exercise deliberately asks the reader to identify what the state model cannot guarantee without concurrency control. The five-context table changes the boundary and failure mode while preserving the same questions.
+
+### Pass D — Editorial-integration findings and revisions
+
+- Added canonical glossary entries for accepted state, aliasing, authoritative source, derived state, domain identity, invariant, state, and state transition.
+- Kept mutation, value equality, candidate state, precondition, and postcondition as chapter-local definitions because their cross-book wording may be owned or refined by Chapters 05 and 24.
+- Assigned this chapter canonical ownership of state, accepted-state invariants, state transitions, derived state, and fact-level authority.
+- Deferred encapsulation to Chapter 03; runtime semantics to Chapter 05; concurrency to Chapters 07 and 16; detailed data modeling to Chapter 13; asynchronous delivery to Chapter 18; caching to Chapter 19; testing methods to Chapter 24; and migration/rollout mechanics to Chapter 26.
+- Used plain-text forward references instead of links to chapter files that do not yet exist.
+- Verified the only internal Markdown links target the created Chapter 02 file from `glossary.md`.
+- Did not modify `book.md` or any unrelated chapter.
+
+### Weaknesses found and revisions performed
+
+| Weakness found | Revision performed | Remaining limitation |
+|---|---|---|
+| “Always” could imply instruction-level consistency. | Added the accepted-state definition and three conditions for safe private intermediate inconsistency. | Readers still need later mechanisms to establish a strong boundary across records or components. |
+| Clearing `completed_at` could appear to erase history. | Added explicit minimal completion/reopen history and separated current from historical facts. | The history schema is intentionally too small for a full audit design. |
+| Treating history as an ordinary side effect could weaken the teaching model. | Stated that required history is part of the logical transition contract and cannot silently disappear from an accepted result. | How to guarantee this is intentionally deferred. |
+| “Single source of truth” could imply one database. | Replaced it with fact-level authority, explicitly permitted copies and different authorities for different facts. | Distributed or shared authority is only acknowledged, not solved. |
+| The five contexts could become five tutorials. | Reduced them to one comparison table with no framework-specific implementation. | The AI-assisted row may need terminology review as later industry conventions evolve. |
+| Four language translations could interrupt the core argument. | Used one compact table and cited official specifications or language documentation. | The comparison necessarily omits many type-specific equality edge cases. |
+| Diagram-only modeling can hide missing cases. | Added an exhaustive transition table for the same lifecycle and explained each representation’s strength. | Permissions and concurrent transitions remain outside both representations. |
+| Open-ended exercises can be difficult to assess. | Added concrete artifacts and concise self-check criteria to every exercise. | A future workbook could provide reviewed sample answers without weakening retrieval practice. |
+
+### Technical accuracy concerns after self-review
+
+No known material technical error remains. The following claims are intentionally bounded and should receive special attention in independent review:
+
+- accepted state is a book-level reasoning definition rather than a universal term of art;
+- the work-item lifecycle and completion equivalence are teaching assumptions, not universal product rules;
+- the logical complete/reopen contract includes history, but no implementation mechanism is promised;
+- JavaScript, Python, Ruby, and Go comparisons describe only the semantics needed to separate identity, equality, and aliasing;
+- a downstream discrepancy is not automatically a violation of the work-item invariant; it may instead violate a convergence, delivery, or freshness expectation.
+
+## Quality-Rubric Evaluation of the Draft
+
+| Criterion | Score | Evidence in the drafted chapter | Remaining limitation |
+|---|---:|---|---|
+| Accuracy | 4/5 | Accepted-state scope avoids instruction-level overclaiming; current and historical state are separated; invalid state and forbidden transition are distinct; all language-specific claims cite primary official documentation. | Enforcement across concurrency or component boundaries is deliberately described only as an unresolved guarantee. |
+| First principles | 5/5 | A concrete contradiction motivates the questions; state is derived from purpose and boundary; invariants arise from jointly contradictory but well-typed fields; transitions and authority answer failures the opening exposes. | None material within scope. |
+| Transferability | 5/5 | The reasoning frame is applied compactly across five engineering contexts and transferred to reservations without depending on a framework or database. | Transfer to highly distributed authority is deferred. |
+| Practicality | 4/5 | The chapter includes a complete worked trace, a stored-derivation contract, a state-review checklist, repair questions, and concrete exercises. | It does not provide implementation recipes, by design. |
+| Trade-offs | 4/5 | Named transitions, computed/stored derivations, mutation/replacement, invariant strength, and logical/physical authority are evaluated under contrasting conditions. | Quantitative workload thresholds cannot be universal and are not invented. |
+| Failure awareness | 5/5 | Duplicated fields, stale derivations, invalid accepted combinations, partial effects, excessive writers, migration risk, and unreproducible generated summaries include assumptions, signals, consequences, or recovery. | Concurrent stale writes are recognized but not mechanistically resolved. |
+| Structure | 4/5 | The path runs from incident to state, identity, invariants, transitions, authority, failure diagnosis, trade-offs, consequences, and verification. Diagram and table appear only after the lifecycle policy is established. | The diagnosis section has several short subsections; they are useful for scanning but add heading density. |
+| Clarity | 4/5 | Terms are defined in plain language and repeatedly grounded in one work item. Tables separate closely related categories without four language tutorials. | The number of necessary foundational distinctions still demands careful reading. |
+| Depth | 4/5 | The chapter treats invariant scope, private intermediate inconsistency, historical versus current facts, valid destinations via forbidden routes, fact-level authority, derivation recovery, and partial effects. | Temporal and cross-boundary correctness are intentionally previews rather than full treatments. |
+| Scope | 5/5 | At roughly 6,000 words, the draft avoids transaction, locking, normalization, messaging, caching, frontend-library, agent-framework, and formal-verification tutorials. One primary example carries the argument. | None material; later reviews should resist expanding deferred mechanisms here. |
+| Verification | 5/5 | Six exercises cover explanation, predicate enumeration, trace diagnosis, authority design, domain transfer, and rebuildability. Each has concrete input and non-prescriptive self-check guidance; the mastery checklist demands application. | Reviewed sample answers are deferred to a possible workbook. |
+| Integration | 4/5 | Canonical terms were added alphabetically to the glossary, used references were added consistently, ownership boundaries are explicit, and forward references avoid broken links. | Chapters 01, 03, 05, and 13 do not yet exist, so cross-chapter consistency cannot be tested against prose. |
+
+**Total:** 53/60
+**Average:** 4.42/5
+
+The draft exceeds the numerical approval threshold and has no criterion below 3/5, but it is intentionally not marked `Approved`. A separate independent review is required by the task and may change these scores.
+
+## Unresolved Concerns and Questions for Independent Review
+
+1. Does the accepted-state definition give enough precision without sounding like a standard term with one industry-wide meaning?
+2. Is the distinction between a required history record and a recoverable downstream effect clear without prematurely requiring a transaction design?
+3. Does the bidirectional completion invariant feel appropriately bounded as a teaching assumption, or does any passage still imply it is universal?
+4. Does the language comparison contain the minimum useful semantics, especially for Go, without inviting runtime misconceptions?
+5. Are the short failure-mode subsections worth their heading density, or should some be merged while preserving incident-scanning value?
+6. Do the self-checks provide enough assessment guidance without functioning as answer keys?
+7. Is the AI-assisted-system comparison durable and conceptual enough for a foundational chapter?
+8. Are any forward references doing explanatory work that Chapter 02 should own instead?
+
+## Final Draft Status and Next Action
+
+**Final status:** `Draft`
+
+**Readiness:** Ready for a separate independent technical and editorial review. The independent reviewer should focus on the eight questions above, validate the language-semantics summary against the cited official sources, and confirm that no deferred mechanism is needed to make a Chapter 02 claim true.
+
+## Independent Review — Chapter Plan
+
+> **Review scope:** The Pass A plan recorded above, not the later drafted chapter
+> **Review date:** 2026-07-13
+> **Recommendation:** `Revise`
+> **Independent plan score:** 4.00/5
+
+The plan has a strong organizing model, a well-chosen recurring example, explicit deferral boundaries, and exercises that test transfer rather than recall. The recommendation is nevertheless `Revise` because central terms that determine the chapter's correctness remain open decisions inside the plan, while the proposed coverage risks diluting the core teaching path. These are architecture findings about the plan as it stood; the later drafting record indicates that some were subsequently addressed, but that does not retroactively make the planning artifact complete.
+
+### Blocking findings
+
+None.
+
+### Major findings
+
+#### 1. The plan defers decisions that define its central mental model
+
+**Relevant sections:** “Primary Mental Model,” “Risks and Open Editorial Questions” items 1, 2, 4, and 5, and “Technical Accuracy Concerns to Resolve During Drafting.”
+
+The plan depends on the claims that invariants hold for accepted state, that an authority accepts facts, and that partially completed work can be classified as either invalid state or a lagging effect. However, it leaves the meanings of accepted versus observable state, current state versus history, and required history versus secondary effects unresolved. Those are not merely wording choices: they determine whether the opening incident, completion invariant, partial-change scenario, and recovery guidance are technically coherent.
+
+**Why it matters:** Without these decisions, readers may infer either that an invariant must hold at every implementation step or that any downstream discrepancy is compatible with correctness. The plan cannot consistently classify a missing audit/history record until it decides whether history is part of the accepted transition contract or a recoverable derivative.
+
+**Concrete revision:** Add a compact classification to the plan before drafting:
+
+| Obligation | Applies to | Example | Required treatment |
+|---|---|---|---|
+| Current-state invariant | Every accepted current snapshot in its declared scope | `completed` iff current `completed_at` is present | Reject or repair before acceptance |
+| Transition rule | A named route between states | Reopen may follow completed, but complete may not follow todo | Check preconditions at the accepting boundary |
+| Historical obligation | Facts that an accepted transition must preserve | A required completion/reopen history record | Include in the logical transition contract; defer enforcement mechanism |
+| Convergence or freshness expectation | A dependent representation over time | Search reflects an accepted title within an agreed lag | Detect, retry, reconcile, or rebuild |
+
+Then define “accepted state” explicitly as book-level vocabulary and state when private intermediate inconsistency is outside the invariant's observation boundary.
+
+#### 2. The proposed chapter carries too many secondary teaching surfaces
+
+**Relevant sections:** “Learning Objectives,” “Proposed Chapter Structure” sections 5 and 8–12, “Supporting Context Examples,” and “Explicit Scope Boundaries.”
+
+The plan combines eleven objectives, identity/value/reference semantics, state-machine notation, authority and derived-state design, four language comparisons, five engineering contexts, five failure classes, asynchronous effects, and AI-agent state. The deferral table is excellent editorial control, but it does not by itself prevent the reader from experiencing the chapter as a survey. Identity/reference semantics in particular can compete with the blueprint's core question and partially belong to Chapter 05.
+
+**Why it matters:** A foundational chapter needs a memorable reasoning sequence. Too many parallel translations increase terminology and heading density, reduce space for one complete worked analysis, and make it harder to distinguish core concepts from previews of later chapters.
+
+**Concrete revision:** Mark the core spine as state boundary → invariant → transition → authority/derivation → failure diagnosis. Keep the work item as the only developed example. Reduce the five-context material to one synthesis table, make language semantics an optional boxed comparison or move most of it to Chapter 05, and use the reservation domain only in the transfer exercise. Cap reader-facing objectives at seven by combining closely related capabilities.
+
+#### 3. “Derived state is reconstructible” is stronger than the plan's own examples support
+
+**Relevant sections:** “Primary Mental Model,” “Concept Map,” “Supporting Context Examples,” and “Exercise Designs — Extend: Design for rebuildability.”
+
+The primary model calls derived state a “reconstructible view,” while the plan also uses AI-generated summaries and acknowledges that old nondeterministic outputs may not be exactly reproducible. Some dependent representations can be recomputed semantically without reproducing the historical artifact; others require stored provenance, rule versions, model versions, or preservation of the output itself.
+
+**Why it matters:** Reconstructibility is presented as a defining property and later as an operational trade-off. That tension can cause readers to misclassify generated artifacts or assume that knowing the inputs guarantees exact recovery.
+
+**Concrete revision:** Define derived state as a representation whose authority and value depend on named inputs plus a declared derivation rule. Treat exact rebuildability as a separate property. Require the plan's derivation contract to record whether regeneration is deterministic, equivalent-but-not-identical, or impossible without preserving the original artifact.
+
+### Minor findings
+
+1. In the concept map, “valid state is the precondition for transition” is too broad. A transition has specific preconditions beyond general validity, and repair or migration workflows may deliberately begin with corrupted legacy state. Label the diagram as normal accepted operation and connect transition-specific preconditions directly to the transition.
+2. “Source of truth: authority for a fact” in the concept-map node collapses decision authority and authoritative representation after the prose carefully distinguishes them. Use two nodes or one neutral “fact-level authority” node.
+3. The selected example's score table gives precise totals without explaining weighting or whether the criteria are independent. Keep it as a qualitative decision matrix or state that all criteria are equally weighted editorial judgments.
+4. The plan proposes both a diagram and a transition table before deciding whether both teach distinct lessons. State the division of labor in the plan: diagram for lifecycle intuition, table for route completeness and transition obligations.
+5. The integration score should remain provisional because Chapter 01 and the key ownership chapters do not exist. The plan correctly records this limitation, but its original 4/5 understates the verification gap.
+
+### Optional improvements
+
+- Add a one-paragraph non-example showing a simple record for which guarded updates are enough and an explicit state-machine abstraction would add ceremony.
+- Give the reusable state-review checklist a stable name so later chapters can invoke it without restating the questions.
+- In the research plan, separate sources needed to verify claims from optional intellectual lineage; Hoare is useful context, but the chapter should not imply that every business invariant uses the formal meaning from program logic.
+
+### Independent quality-rubric scores for the plan
+
+| Criterion | Score | Independent evidence and rationale |
+|---|---:|---|
+| Accuracy | 4/5 | Important distinctions and implementation-dependent verification needs are identified, but accepted-state semantics and exact rebuildability are unresolved or overstated. |
+| First principles | 5/5 | The plan derives the model from contradictory observations, then moves from facts to predicates, transitions, authority, and consequences. |
+| Transferability | 5/5 | The model is language- and framework-independent and has credible transfer cases across system boundaries. |
+| Practicality | 4/5 | Failure traces, derivation questions, and a proposed state-review checklist are directly applicable; the end-to-end worked analysis remains only planned. |
+| Trade-offs | 4/5 | The plan explicitly rejects universal prescriptions and names meaningful alternatives, though several comparisons remain lists rather than decisions under shared constraints. |
+| Failure awareness | 5/5 | It covers contradictory fields, stale derivatives, partial effects, ambiguous writers, recovery, and the boundary of later concurrency mechanisms. |
+| Structure | 3/5 | The reasoning spine is sound, but thirteen proposed sections and several parallel translation surfaces create a substantial risk of fragmentation and repetition. |
+| Clarity | 4/5 | Definitions are concrete and grounded in one example; the volume of adjacent foundational terminology remains demanding. |
+| Depth | 4/5 | Scope, history, recovery, invalid routes, and authority go beyond introductory definitions without attempting formal methods. |
+| Scope | 3/5 | Explicit exclusions are strong, but planned breadth across identity semantics, five contexts, four languages, asynchronous effects, and AI remains excessive for the core question. |
+| Verification | 4/5 | Six reasoning exercises include strong-answer criteria, but the artifacts and self-check material are not yet drafted. |
+| Integration | 3/5 | Ownership and deferrals are thoughtfully mapped, but there are no earlier approved chapters or adjacent chapter prose against which terminology and duplication can be verified. |
+
+**Total:** 48/60
+**Average:** 4.00/5
+
+The numerical average reaches the chapter approval threshold, but a planning artifact cannot be approved under the chapter rubric, and the three major findings warrant revision before treating the architecture as settled.
+
+### Three highest-value revisions
+
+1. Resolve accepted-state, observation-boundary, history, and convergence semantics in the architecture itself.
+2. Reduce the reader-facing scope to the core reasoning spine and demote language/context translations to compact supporting material.
+3. Separate dependency on authoritative inputs from exact rebuildability in the definition and operational contract for derived state.
+
+### Independent plan-review status
+
+**Recommendation:** `Revise`
+
+**Unresolved questions:** How much identity/reference material is essential before Chapter 05, and whether exact historical AI-generated outputs are records to preserve rather than derivatives expected to rebuild.
+
+**Recommended next action:** Reconcile these plan findings against the existing draft, then perform a separate independent review of the actual chapter prose. Do not use this plan-only score to approve or reject the drafted chapter.
+
+## Independent Review — Drafted Chapter
+
+> **Review scope:** `chapters/02-state-invariants-and-change.md`
+> **Review date:** 2026-07-13
+> **Recommendation:** `Revise`
+> **Independent draft score:** 4.25/5
+
+The draft is conceptually strong, transferable, and practically useful. It turns a potentially abstract topic into a reusable diagnostic method, keeps the work-item example coherent, treats trade-offs fairly, and supplies unusually good reasoning exercises. The independent recommendation is `Revise` because one material internal contradiction remains in the treatment of required transition history. The chapter exceeds the numerical threshold, but the quality rubric also requires all material accuracy concerns to be resolved before approval.
+
+### Reconciliation with the independent plan review
+
+| Plan finding | Draft status | Evidence and remaining work |
+|---|---|---|
+| Accepted-state, observation-boundary, history, and convergence semantics were unresolved. | Partially resolved | “Candidate state and accepted state,” “Scope is part of the claim,” and “Invariant, validation rule, and goal” now define the categories clearly. The remaining execution-trace contradiction is the draft's one major finding below. |
+| The proposed chapter carried too many secondary teaching surfaces. | Resolved sufficiently | One developed work-item example carries the chapter. Language differences and five engineering contexts are each compressed into a table; reservations appear only as a transfer exercise. The identity section remains substantial but supports the aliasing failure model. |
+| “Derived state is reconstructible” was too strong. | Resolved | “Derived state creates a contract” defines derivation by named inputs and a rule, then explicitly explains that a nondeterministic summary may not be exactly reproducible. The rebuildability exercise tests the distinction. |
+
+### Blocking findings
+
+None.
+
+### Major findings
+
+#### 1. Required transition history is accepted both atomically and afterward
+
+**Relevant chapter sections:** “Scope is part of the claim,” “Change Is More Than Assignment,” and “Diagnosing Divergence.”
+
+The chapter states that preserving the corresponding history record is part of the logical complete/reopen contract and that failure must not leave an accepted current state without that history. The `complete(item, at)` example includes the append as an effect, but its postcondition mentions only `status` and `completed_at`. More importantly, the execution trace records the work-item transition as accepted at `10:03:00` and the required history record as appended at `10:03:01`. The exercise repeats the same ordering: the authoritative boundary first accepts completion, then the history append succeeds.
+
+**Why it matters:** The trace models exactly the intermediate accepted condition the earlier section declares impermissible. If the history append at `10:03:01` fails, the current state has already been described as accepted without a required part of its logical contract. Readers cannot tell whether history is required for acceptance or is a downstream effect allowed to recover later.
+
+**Concrete revision:** Make one consistent choice and reflect it in all three places. Under the chapter's stated teaching model, the smallest revision is:
+
+- add “the corresponding completed history record exists” to the successful transition postcondition;
+- show current-state changes and required history becoming accepted together as one logical event, while explicitly deferring the implementation mechanism;
+- begin the divergence trace with that combined accepted result, then sequence only the project count, search, and notification as downstream effects;
+- update the dashboard exercise so the required history record is already part of step 1 rather than a later step.
+
+If the author instead wants history to be recoverable after current state is accepted, the earlier claim that it is part of the logical acceptance contract must be weakened. The current chapter argues more coherently for the first option.
+
+### Minor findings
+
+1. **The accepted-state definition is partly circular.** “Accepted state is state that has crossed the boundary responsible for validating and accepting a change” identifies the boundary but defines acceptance using “accepting.” Replace the second use with a concrete decision: the accountable boundary has evaluated the proposal, committed to the resulting facts under its guarantee, and made them eligible to serve as authoritative current state.
+2. **“May therefore be relied upon by the rest of the system” can imply freshness or universal visibility.** Later sections correctly deny that implication. Qualify the definition immediately: consumers may rely on the fact when obtained from the authoritative contract, while their local copies may remain stale.
+3. **The derivation contract does not expose reproducibility as a first-class question.** The prose and exercise correctly discuss nondeterministic summaries, but the contract table includes only `Recovery: Recompute`. Add a row such as “Reproducibility: exact, semantically equivalent, or original artifact must be retained.”
+4. **The reusable review can encourage irrelevant alias analysis.** Item 3 asks for runtime aliases for every feature or incident. Change it to “domain identity and any runtime aliases relevant to the failure” so the checklist remains proportionate.
+5. **The reservation exercise temporarily overstates the source of availability.** “Treat resource availability as a derivation from reservations” can exclude capacity, maintenance, blackout periods, and policy. Ask the reader to define the inputs to availability, including reservations, under explicit assumptions.
+6. **The estimated study time is optimistic if exercises are included.** Reading roughly 6,000 words may fit 75–90 minutes, but completing six open-ended exercises and the diagrams likely will not. Clarify whether the estimate covers reading only or increase it for full study.
+
+### Optional improvements
+
+- The four-language identity table is accurate and compact, but it can be demoted to a clearly optional translation box if pacing feedback shows that it interrupts the core state/invariant progression.
+- Give “A reusable state review” a stable cross-book name, such as “State-change review,” so later chapters can extend it without restating all nine questions.
+- The opening says search places the item in an “In progress” column. Calling this a search result or search-backed board view would avoid momentary confusion between search and board responsibilities.
+- Consider adding one sentence that repair and migration transitions may start from already-invalid legacy state; the normal accepted-state diagram is not the only kind of operational transition.
+
+### Citation and technical-claim verification
+
+The language-semantics table was checked against the official sources cited by the chapter:
+
+- ECMAScript strict equality compares ordinary object values by identity rather than structural field equality.
+- Python documents object identity, type, and value separately, and `is` compares identity.
+- Ruby documents `equal?` as object identity and `==` as commonly overridden for class-specific equality.
+- Go documents arrays and structs as self-contained values while pointer-, function-, slice-, map-, and channel-like values can reference shared underlying data; the chapter correctly qualifies struct fields that themselves carry references.
+
+No material error was found in those bounded claims. The Hoare citation is used appropriately as intellectual lineage rather than as evidence that the book's business-rule terminology is formally identical to Hoare logic.
+
+### Independent quality-rubric scores for the draft
+
+| Criterion | Score | Independent evidence and rationale |
+|---|---:|---|
+| Accuracy | 3/5 | Core concepts and cited language claims are accurate and carefully qualified, but the acceptance/history ordering contradicts the chapter's declared logical contract. |
+| First principles | 5/5 | The chapter begins with contradictory observations, derives the need for scoped state, then builds invariants, transitions, authority, and derivation obligations in response. |
+| Transferability | 5/5 | One durable model transfers across frontend, backend, storage, asynchronous, AI-assisted, and reservation contexts without depending on a framework. |
+| Practicality | 4/5 | The execution trace, derivation contract, transition table, and reusable review are directly useful in feature design and incident analysis. The chapter appropriately avoids implementation recipes. |
+| Trade-offs | 4/5 | Named transitions, guarded CRUD, computed/stored derivations, mutation/replacement, invariant strength, and logical/physical authority receive balanced treatment with concrete constraints. |
+| Failure awareness | 5/5 | The draft covers duplicated fields, stale projections, invalid combinations, partial effects, multiple writers, migration, repair, and nondeterministic rebuilds. |
+| Structure | 4/5 | The progression is logical and the recurring example provides continuity. Several failure-mode subsections and foundational distinctions add density but remain scannable. |
+| Clarity | 4/5 | Definitions are accessible and bounded; the acceptance/history contradiction and slightly circular accepted-state definition create localized ambiguity. |
+| Depth | 4/5 | The chapter goes beyond definitions into scope, observation boundaries, historical obligations, forbidden routes, fact-level authority, recovery, and production consequences. |
+| Scope | 4/5 | The draft successfully compresses language and context translations and defers mechanisms. Identity/reference material is sizeable but still supports the chapter's state-change reasoning. |
+| Verification | 5/5 | Six concrete exercises test explanation, enumeration, diagnosis, authority design, transfer, and rebuildability. Self-checks reward reasoning without supplying full answers. |
+| Integration | 4/5 | Canonical glossary terms, references, and conceptual ownership are well recorded; integration with Chapters 01, 03, 05, and 13 cannot yet be tested against prose. |
+
+**Total:** 51/60
+**Average:** 4.25/5
+
+### Three highest-value revisions
+
+1. Make required history part of the transition postcondition and the same logical acceptance event in both the worked trace and exercise.
+2. Tighten the accepted-state definition so it distinguishes authoritative validity from downstream visibility and freshness without circular wording.
+3. Add exact reproducibility to the stored-derivation contract and qualify the reservation availability inputs.
+
+### Independent draft-review status
+
+**Final status:** `Revision Required`
+
+**Recommendation:** `Revise`
+
+**Unresolved questions:** Whether the estimated study time includes exercises, and whether the language-translation table should remain in the main reading path after reader testing.
+
+**Recommended next action:** Correct the history-acceptance contradiction and the high-value minor findings, then rerun the accuracy and clarity portions of the independent review. If the major finding is resolved without introducing a new material concern, the chapter is likely to meet the approval threshold.
+
+## Focused Revision and Approval Review
+
+> **Revision date:** 2026-07-13
+> **Review scope:** Major finding and six minor findings from the independent draft review
+> **Recommendation:** `Approve`
+> **Post-revision score:** 4.33/5
+
+### Revision actions completed
+
+- Defined accepted state without circular use of “accepting” and distinguished authoritative commitment from the freshness of downstream copies.
+- Added the required completion-history record to the transition postcondition.
+- Changed the worked execution trace and dashboard exercise so current state and required history become accepted as one logical result.
+- Made reproducibility an explicit part of the stored-derivation contract, including exact, equivalent-but-not-identical, and preserved-artifact cases.
+- Scoped runtime-alias analysis in the state-change review to aliases relevant to the failure.
+- Expanded the reservation exercise so availability can depend on reservations, capacity, maintenance, blackout periods, and policy under declared assumptions.
+- Clarified that the study-time estimate distinguishes reading from completing the exercises.
+- Clarified the opening's search-backed board view and added a bounded note about repair and migration operations that begin from invalid legacy state.
+- Updated the canonical accepted-state definition in `glossary.md`.
+
+### Focused verification
+
+- The transition definition, postcondition, explanatory prose, worked trace, and exercise now consistently treat required history as part of the same logical acceptance event.
+- The revised accepted-state definition no longer implies that all consumers immediately observe fresh data.
+- The major finding and all six minor findings from the independent review are resolved.
+- The chapter retains one developed example, valid heading hierarchy, balanced code fences, working internal glossary links, and the previously verified primary-source citations.
+- No placeholder section or known material technical-accuracy concern remains.
+
+### Final quality-rubric scores
+
+| Criterion | Score | Final evidence and remaining limitation |
+|---|---:|---|
+| Accuracy | 4/5 | Acceptance and required history are now internally consistent; language claims remain verified and bounded. Concrete enforcement across transactions or distributed boundaries is intentionally deferred. |
+| First principles | 5/5 | Contradictory observations motivate scoped state, invariants, transitions, authority, and derivation obligations. |
+| Transferability | 5/5 | The model transfers across engineering contexts and the reservation exercise without depending on a framework. |
+| Practicality | 4/5 | The transition table, derivation contract, execution trace, and state-change review are directly usable; implementation recipes remain out of scope. |
+| Trade-offs | 4/5 | Alternatives are evaluated under workload, product-flexibility, recovery, and operational constraints. |
+| Failure awareness | 5/5 | The chapter covers invalid combinations, forbidden routes, stale derivatives, partial effects, excessive writers, migrations, repairs, and nondeterministic outputs. |
+| Structure | 4/5 | The progression is coherent and one recurring example anchors the chapter; foundational density remains appropriate for the topic. |
+| Clarity | 4/5 | Accepted state, history, authority, and freshness are now distinguished consistently; the chapter still requires careful reading because the concepts are adjacent. |
+| Depth | 4/5 | Scope, observation boundaries, history, recovery operations, authority, and production consequences go meaningfully beyond introductory definitions. |
+| Scope | 4/5 | Supporting translations remain compact, and later mechanisms are explicitly deferred. |
+| Verification | 5/5 | Six concrete exercises and the mastery checklist test explanation, diagnosis, design, and transfer. |
+| Integration | 4/5 | Glossary and references are consistent, ownership boundaries are explicit, and forward references remain unlinked until target chapters exist. Cross-chapter prose comparison awaits those drafts. |
+
+**Total:** 52/60
+**Average:** 4.33/5
+
+### Remaining non-blocking improvements
+
+- Reader testing may show that the four-language translation table works better as optional material, but it is accurate, compact, and currently supports the aliasing discussion.
+- The first three-to-five-chapter integration pass should recheck accepted-state, authority, identity, and boundary terminology against Chapters 01, 03, and 05.
+- A future exercise workbook could add reviewed sample answers while preserving the chapter's retrieval-practice design.
+
+### Final approval status
+
+**Final status:** `Approved`
+
+The chapter meets the repository threshold: average at least 4/5, no criterion below 3/5, no unresolved material accuracy concern, no placeholders, and required glossary, reference, exercise, mastery, and integration records present.
+
+**Recommended next action:** Plan Chapter 03, Abstraction, Modularity, and Boundaries, while carrying forward Chapter 02's canonical state-change vocabulary.

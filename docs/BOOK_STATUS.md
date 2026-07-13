@@ -2,7 +2,7 @@
 
 > **Book version:** 0.1 — architecture
 > **Last meaningful update:** 2026-07-13
-> **Current focus:** Chapter 02 architecture is ready for human review; drafting has not begun.
+> **Current focus:** Chapter 02 is approved; Chapter 03 planning is next.
 
 Scores remain `—` until a complete, evidence-backed rubric review exists. Dependencies are editorial guidance inferred from the blueprint; they identify the most important conceptual inputs, not an exhaustive reading order.
 
@@ -10,7 +10,7 @@ Scores remain `—` until a complete, evidence-backed rubric review exists. Depe
 |---|---|---|---:|---|---|
 | **Part I — Thinking Like a Software Engineer** |  |  |  |  |  |
 | 01 — What Software Engineering Actually Is | Planned | None; establishes vocabulary used throughout | — | — | Plan after the central technical voice is established, per the suggested writing order |
-| 02 — State, Invariants, and Change | Planning | Chapter 01 helpful but not required; plan defines prerequisites and later-chapter boundaries | 4.25/5 (plan) | 2026-07-13 | Human-review the architecture and resolve its central terminology questions before drafting |
+| 02 — State, Invariants, and Change | Approved | Chapter 01 helpful but not required; foundational terms and later-chapter ownership boundaries are recorded in the review | 4.33/5 (final) | 2026-07-13 | Carry canonical state-change vocabulary into Chapter 03 planning and the first cross-chapter integration pass |
 | 03 — Abstraction, Modularity, and Boundaries | Planned | Chapters 01–02 | — | — | Plan after Chapter 02 |
 | 04 — Complexity and Engineering Trade-offs | Planned | Chapters 01–03 | — | — | Plan after the rest of Part I |
 | **Part II — How Computers Execute Software** |  |  |  |  |  |
@@ -55,4 +55,4 @@ Schedule a terminology, duplication, prerequisite, example-consistency, and cros
 
 ## Immediate decision
 
-The blueprint's suggested writing order starts with Chapter 02 rather than Chapter 01. Chapter 02 is now in `Planning`; its architecture review should be approved by a human before a separate drafting task begins.
+The blueprint's suggested writing order starts with Chapter 02 rather than Chapter 01. Chapter 02 is now `Approved` after focused revision resolved the independent review's material history-acceptance concern. The next task is to plan Chapter 03 while preserving Chapter 02's canonical definitions and recording any cross-chapter terminology pressure for the scheduled integration pass.
